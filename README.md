@@ -22,13 +22,16 @@ MS paint in Clojure + Swing. Start drawing with:
 - Select
 - Magnifier
 
+### Original commit
+29 Dec 2021
+
 ## Usage
 
     $ java -jar swing-paint-0.1.0-standalone.jar [args]
 
 ## License
 
-Copyright © 2021 FIXME
+Copyright © 2021 - 2023
 
 This program and the accompanying materials are made available under the
 terms of the Eclipse Public License 2.0 which is available at
