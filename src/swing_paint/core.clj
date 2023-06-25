@@ -1,8 +1,9 @@
 (ns swing-paint.core
   (:require
-    [swing-paint.state :refer :all]
-    [swing-paint.tools :refer :all]
-    [swing-paint.gui :refer :all])
+    [swing-paint
+     [state :refer :all]
+     [tools :refer :all]
+     [gui :refer :all]])
   (:import (javax.swing UIManager))
   (:gen-class))
 

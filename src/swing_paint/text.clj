@@ -56,10 +56,10 @@
                                             (draw-text event buf1 buf1 buf2 x y)))))]
 
     (.addDocumentListener (.getDocument textframe-input)
-                          (proxy [DocumentListener] []
-                            (changedUpdate [event] (println "ahoj"))
-                            (removeUpdate [event])
-                            (insertUpdate [event]
+                          (reify DocumentListener
+                            (changedUpdate [this_ event_])
+                            (removeUpdate [this_ event_])
+                            (insertUpdate [this_ event]
                               (let [d (.getDocument event)]
                                 (swap! paint-state assoc :text (.getText d 0 (.getLength d)))))))
     ;   (draw-text event buf2 buf1 buf2 x y)))))

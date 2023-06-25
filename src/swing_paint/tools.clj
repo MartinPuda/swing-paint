@@ -1,8 +1,9 @@
 (ns swing-paint.tools
   (:import (java.awt Color Cursor BasicStroke GradientPaint Graphics2D AlphaComposite RadialGradientPaint Polygon TexturePaint Rectangle)
            (java.awt.geom Rectangle2D$Double RoundRectangle2D$Double Ellipse2D$Double Point2D Point2D$Float Path2D$Float GeneralPath))
-  (:use swing-paint.state
-        swing-paint.text)
+  (:require [swing-paint
+             [state :refer :all]
+             [text :refer :all]])
   (:gen-class))
 
 ;;; tools
@@ -125,7 +126,7 @@
       (.setStroke (get-stroke :tool-size))
       (.setPaint (get-paint shift-x shift-y (+ shift-x b) (+ shift-y b)))
       (.fill obj))
-    (when (> (:border-size @paint-state) 0)
+    (when (pos? (:border-size @paint-state))
       (doto (.getGraphics buf-image)
         (.setStroke (get-stroke :border-size))
         (.setColor (:background-color @paint-state))

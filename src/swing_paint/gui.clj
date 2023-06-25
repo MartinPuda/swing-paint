@@ -1,9 +1,11 @@
 (ns swing-paint.gui
   (:require
-    [swing-paint.state :refer :all]
-    [swing-paint.text :refer :all]
-    [swing-paint.tools :refer :all]
-    [swing-paint.colors :refer :all])
+    [swing-paint
+     [state :refer :all]
+     [text :refer :all]
+     [tools :refer :all]
+     [colors :refer :all]]
+    [clojure.string :as str])
   (:import (javax.swing JButton BorderFactory JSeparator ImageIcon SwingUtilities JColorChooser JPanel JSpinner SpinnerNumberModel JRadioButton ButtonGroup JLabel JMenuBar JMenu JMenuItem JFileChooser BoxLayout JFrame)
            (java.awt Color Dimension Cursor GridLayout Component FlowLayout BorderLayout Container)
            (java.awt.event ActionListener MouseAdapter ComponentAdapter MouseMotionAdapter)
@@ -59,8 +61,8 @@
                  (.setIcon (ImageIcon. (str "resources/button" tool-number ".png")))
                  (.setBounds x y 25 25)
                  (.setBorder (swing-paint.gui/paint-black-border))
-                 (.addActionListener (proxy [ActionListener] []
-                                       (actionPerformed [_]
+                 (.addActionListener (reify ActionListener
+                                       (actionPerformed [this_ event_]
                                          (swap! paint-state assoc :tool tool-keyword)
                                          (when (= tool-keyword :rubber)
                                            (let [color Color/WHITE]
@@ -227,14 +229,14 @@
 
         radio-button-listener
         (fn [data]
-          (proxy [ActionListener] []
-            (actionPerformed [_]
+          (reify ActionListener
+            (actionPerformed [this_ event_]
               (swap! paint-state assoc :stroke data))))
 
         radio-button-listener2
         (fn [data]
-          (proxy [ActionListener] []
-            (actionPerformed [_]
+          (reify ActionListener
+            (actionPerformed [this_ event_]
               (let [chooser (JFileChooser.)]
                 (when (and (= data :texture)
                            (zero? (.showOpenDialog chooser nil)))
@@ -388,8 +390,8 @@
                     (.setJMenuBar (doto (JMenuBar.)
                                     (.add (doto (JMenu. "Menu")
                                             (.add (doto (JMenuItem. "New") ;clears buf1
-                                                    (.addActionListener (proxy [ActionListener] []
-                                                                          (actionPerformed [_]
+                                                    (.addActionListener (reify ActionListener
+                                                                          (actionPerformed [this_ event_]
                                                                             (let [src canvas
                                                                                   grcn (.getGraphics src)
                                                                                   grbuf (.getGraphics buf1)]
@@ -397,14 +399,14 @@
                                                                               (.fillRect grbuf 0 0 (.getWidth buf1) (.getHeight buf1))
                                                                               (.drawImage grcn buf1 0 0 nil)))))))
                                             (.add (doto (JMenuItem. "Open") ;opens image into canvas
-                                                    (.addActionListener (proxy [ActionListener] []
-                                                                          (actionPerformed [_]
+                                                    (.addActionListener (reify ActionListener
+                                                                          (actionPerformed [this_ event_]
                                                                             (let [src canvas
-                                                                                  chooser (new JFileChooser)
-                                                                                  returnVal (.showOpenDialog chooser nil)
+                                                                                  chooser (JFileChooser.)
+                                                                                  return-val (.showOpenDialog chooser nil)
                                                                                   grcn (.getGraphics src)
                                                                                   grbuf (.getGraphics buf1)]
-                                                                              (when (= returnVal 0)
+                                                                              (when (zero? return-val)
                                                                                 (let [selected-file (.getSelectedFile chooser)
                                                                                       abspath (.getAbsolutePath selected-file)
                                                                                       image (ImageIO/read (File. abspath))]
@@ -413,9 +415,9 @@
                                                                                   (.drawImage grbuf image 0 0 nil) ;grafika mista, jaky obrazek, prvne do bufferu
                                                                                   (.drawImage grcn buf1 0 0 nil))))))))) ;a pak prekresli canvas
                                             (.add (doto (JMenuItem. "Save")
-                                                    (.addActionListener (proxy [ActionListener] []
-                                                                          (actionPerformed [_]
-                                                                            (try (let [chooser (new JFileChooser)
+                                                    (.addActionListener (reify ActionListener
+                                                                          (actionPerformed [this_ event_]
+                                                                            (try (let [chooser (JFileChooser.)
                                                                                        returnVal (.showSaveDialog chooser nil)]
                                                                                    (when (= returnVal JFileChooser/APPROVE_OPTION)
                                                                                      (let [selected-file (.getSelectedFile chooser)
@@ -423,7 +425,7 @@
                                                                                        (println selected-file)
                                                                                        (println abspath)
                                                                                        (ImageIO/write buf1 "png" (File.
-                                                                                                                   (if (clojure.string/ends-with? abspath ".png")
+                                                                                                                   (if (str/ends-with? abspath ".png")
                                                                                                                      abspath
                                                                                                                      (str abspath ".png"))))
                                                                                        ; jpg didn't work
